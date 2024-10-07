@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: backend-service
+    env: docker
+    region: oregon  # Cambia esto según tu preferencia
+    plan: free  # O cambia a un plan de pago si lo necesitas
+    branch: main
+    healthCheckPath: /
+    envVars:
+      - key: DB_TYPE
+        value: postgres  # Cambiamos a postgres ya que Render ofrece PostgreSQL gratis
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 5432  # Puerto por defecto para PostgreSQL
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+
+databases:
+  - name: backend_db
+    databaseName: backend_db
+    user: backend_user
