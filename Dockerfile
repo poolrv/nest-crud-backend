@@ -12,7 +12,6 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
-COPY .env .
 COPY wait-for-it.sh .
 RUN chmod +x wait-for-it.sh
 EXPOSE 3001
