@@ -8,17 +8,17 @@ services:
     healthCheckPath: /
     envVars:
       - key: DB_TYPE
-        value: postgres  # Cambiamos a postgres ya que Render ofrece PostgreSQL gratis
+        value: mysql
       - key: DB_HOST
-        sync: false
+        sync: false  # Esto significa que deberás configurar manualmente este valor en Render
       - key: DB_PORT
-        value: 5432  # Puerto por defecto para PostgreSQL
+        value: 3306
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
         sync: false
       - key: DB_NAME
-        sync: false
+        value: itemsdb
 
 databases:
   - name: backend_db
