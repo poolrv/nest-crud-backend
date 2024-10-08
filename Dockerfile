@@ -3,7 +3,7 @@ FROM node:20 AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install  # Cambia npm ci por npm install
 
 COPY . .
 RUN npm run build
@@ -13,7 +13,7 @@ FROM node:20-slim
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --only=production  # Cambia npm ci por npm install
 
 COPY --from=builder /app/dist ./dist
 
