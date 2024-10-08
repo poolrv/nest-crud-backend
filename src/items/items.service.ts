@@ -1,25 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Item } from './entities/item.entity'; // Asegúrate de tener la entidad 'Item' creada
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { Item } from './entities/item.entity';
 
 @Injectable()
 export class ItemsService {
-  constructor(
-    @InjectRepository(Item)
-    private itemsRepository: Repository<Item>,
-  ) {}
+  private items: Item[] = []; // Almacenamiento en memoria
 
   // Obtener todos los elementos
-  async findAll(): Promise<Item[]> {
-    return await this.itemsRepository.find();
+  findAll(): Item[] {
+    return this.items;
   }
 
   // Obtener un elemento por ID
-  async findOne(id: number): Promise<Item> {
-    const item = await this.itemsRepository.findOne({ where: { id } });
+  findOne(id: number): Item {
+    const item = this.items.find((item) => item.id === id);
     if (!item) {
       throw new NotFoundException(`Item con ID ${id} no encontrado`);
     }
@@ -27,21 +22,30 @@ export class ItemsService {
   }
 
   // Crear un nuevo elemento
-  async create(createItemDto: CreateItemDto): Promise<Item> {
-    const newItem = this.itemsRepository.create(createItemDto);
-    return await this.itemsRepository.save(newItem);
+  create(createItemDto: CreateItemDto): Item {
+    const newItem = {
+      id: this.items.length ? this.items[this.items.length - 1].id + 1 : 1,
+      ...createItemDto,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.items.push(newItem);
+    return newItem;
   }
 
   // Actualizar un elemento por ID
-  async update(id: number, updateItemDto: UpdateItemDto): Promise<Item> {
-    const item = await this.findOne(id);
-    const updatedItem = Object.assign(item, updateItemDto);
-    return await this.itemsRepository.save(updatedItem);
+  update(id: number, updateItemDto: UpdateItemDto): Item {
+    const item = this.findOne(id);
+    Object.assign(item, updateItemDto, { updatedAt: new Date() });
+    return item;
   }
 
   // Eliminar un elemento por ID
-  async remove(id: number): Promise<void> {
-    const item = await this.findOne(id);
-    await this.itemsRepository.remove(item);
+  remove(id: number): void {
+    const index = this.items.findIndex((item) => item.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`Item con ID ${id} no encontrado`);
+    }
+    this.items.splice(index, 1);
   }
 }

@@ -1,18 +1,24 @@
 # Stage 1: Build the application
 FROM node:20 AS builder
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
 COPY . .
 RUN npm run build
 
 # Stage 2: Run the application
-FROM node:20
+FROM node:20-slim
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm ci --only=production
+
 COPY --from=builder /app/dist ./dist
-COPY wait-for-it.sh .
-RUN chmod +x wait-for-it.sh
+
+# Expone el puerto 3001
 EXPOSE 3001
-CMD ["./wait-for-it.sh", "mysql:3306", "--", "node", "dist/main.js"]
+
+# Comando de inicio
+CMD ["node", "dist/main.js"]
